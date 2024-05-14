@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='UTF-8'>
+    <title>XMLHttpRequest #03</title>
+    <link rel='stylesheet' href='css/estilo.css'>
+</head>
+
+<body class="conteudo exercicio">
+    <h1>Estados</h1>
+
+    <script>
+
+        function ajax(config) {
+            const xhr = new XMLHttpRequest();
+
+            xhr.open(config.metodo, config.url, true);
+
+            xhr.onreadystatechange = function(e) {
+
+                if(xhr.readyState === 4) {
+                    if(xhr.status >= 200 && xhr.status < 300) {
+                        config.sucesso(xhr.responseXML);
+                    } else if(xhr.readyState >= 400) {
+                        config.erro({
+                            codigo: xhr.status,
+                            texto: xhr.statusText
+                        });
+                    }
+                }
+
+            };
+
+            xhr.send();
+        }
+
+        ajax({
+            url: 'dados/estados.xml',
+            metodo: 'GET',
+            sucesso(resposta) {
+                const estados = resposta.getElementsByTagName('estado');
+                
+                const lista = document.createElement('ul');
+                lista.type = 'circle';
+                
+                Array.from(estados).forEach((estado) => {
+                    const item = `${estado.attributes.nome.value}`;
+                    
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    lista.appendChild(li);
+                });
+
+                document.body.insertAdjacentElement('beforeend', lista);
+            },
+            erro(e) {
+                const msg = document.createTextNode(`${e.codigo}: ${e.texto}`);
+                document.appendChild(msg);
+            }
+        });
+
+    </script>
+</body>

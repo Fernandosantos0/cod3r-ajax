@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='UTF-8'>
+    <title>XMLHttpRequest #02</title>
+    <link rel='stylesheet' href='css/estilo.css'>
+    <style>
+        input[type=file] {
+            display: flex;
+            margin: 10px;
+            padding: 40px;
+            font-size: 40px;
+            background: crimson;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+
+<body class="conteudo exercicio">
+    <input type="file" name="arquivo" />
+    <div class="progresso"></div>
+
+    <script>
+        function ajaxUpload(config) {
+            const xhr = new XMLHttpRequest();
+
+            /* Verificando se existe uma operação de upload */
+            if(xhr.upload) {
+                xhr.upload.onprogress = function(e) {
+                    const atual = e.loaded; // Quantidade de dados carregando
+                    const total = e.total; // Tamanho do arquivo
+                    const percentual = Math.floor(atual / total * 100); // Calculando o percentual
+
+                    config.progresso({ atual, total, percentual });
+                };
+            }
+
+            xhr.open('POST', config.url, true); // Método para o POST de arquivo
+            xhr.send(config.formData); // Metodo de requisição
+        }
+
+        document.querySelector('input[type=file]').onchange = function(e) {
+            const formData = new FormData();
+            const el = e.target;
+            formData.append(el.name, el.files[0]);
+
+            ajaxUpload({
+                url: 'upload',
+                formData: formData,
+                progresso(dados) {
+                    const progresso = document.querySelector('.progresso');
+                    progresso.innerHTML = JSON.stringify(dados);
+                },
+            });
+        };
+    </script>
+</body>
